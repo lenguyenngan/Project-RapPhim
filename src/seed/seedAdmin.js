@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import User from "../model/User.js";
 import bcrypt from "bcryptjs";
+import { generateToken } from "../utils/auth.js"; // import hàm tạo token
 
 dotenv.config();
 
@@ -9,10 +10,11 @@ const seedAdmin = async () => {
   try {
     const existingAdmin = await User.findOne({ email: "admin@rapphim.com" });
 
+    let admin;
     if (!existingAdmin) {
       const hashedPassword = await bcrypt.hash("123456", 10);
 
-      await User.create({
+      admin = await User.create({
         username: "admin",
         fullName: "Super Admin",
         email: "admin@rapphim.com",
@@ -21,12 +23,17 @@ const seedAdmin = async () => {
         role: "superadmin",
       });
 
-      console.log(" Superadmin created successfully");
+      console.log("Superadmin created successfully");
     } else {
-      console.log(" Superadmin already exists");
+      admin = existingAdmin;
+      console.log("Superadmin already exists");
     }
+
+    // Tạo token cho admin và in ra console
+    const token = generateToken(admin);
+    console.log("Admin token:", token);
   } catch (error) {
-    console.error(" Seed admin error:", error.message);
+    console.error("Seed admin error:", error.message);
   }
 };
 
