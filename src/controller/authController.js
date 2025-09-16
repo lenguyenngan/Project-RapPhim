@@ -1,19 +1,24 @@
 import User from "../model/User.js";
 import jwt from "jsonwebtoken";
 
-//------------------------0-Đăng ký------------------//
+//-------------------------Đăng ký------------------//
 export const register = async (req, res) => {
   try {
     const { fullName, email, password, phone } = req.body;
 
-    const existingUser = await User.findOne({ email });
-    if (existingUser)
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
       return res.status(400).json({ message: "Email already exists" });
+    }
+
+    const existingPhone = await User.findOne({ phone });
+    if (existingPhone) {
+      return res.status(400).json({ message: "Phone number already exists" });
+    }
 
     const newUser = new User({ fullName, email, password, phone });
     await newUser.save();
 
-    // Loại bỏ password khi trả về
     const userResponse = {
       id: newUser._id,
       fullName: newUser.fullName,
