@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import User from "../model/User.js";
 import bcrypt from "bcryptjs";
-import { generateToken } from "../utils/auth.js"; // import hàm tạo token
+import { generateToken } from "../utils/auth.js";
 
 dotenv.config();
 
@@ -18,7 +18,7 @@ const seedAdmin = async () => {
         username: "admin",
         fullName: "Super Admin",
         email: "admin@rapphim.com",
-        password: hashedPassword,
+        password: "123456", //Password sẽ được hash tự động trong pre-save hook
         phone: "0123456789",
         role: "superadmin",
       });
