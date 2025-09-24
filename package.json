@@ -6,7 +6,9 @@
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.18.1"
+    "mongodb-memory-server": "^10.2.1",
+    "mongoose": "^8.18.1",
+    "zod": "^4.1.11"
   },
   "name": "test-backend",
   "version": "1.0.0",
@@ -20,5 +22,21 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lenguyenngan/Project-RapPhim.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lenguyenngan/Project-RapPhim/issues"
+  },
+  "homepage": "https://github.com/lenguyenngan/Project-RapPhim#readme",
+  "description": "",
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.5.2",
+    "nodemon": "^3.1.10",
+    "prisma": "^6.16.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  }
 }
