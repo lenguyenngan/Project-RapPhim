@@ -4,8 +4,13 @@ import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./src/config/db.js";
 import seedAdmin from "./src/seed/seedAdmin.js";
+import seedCinema from "./src/seed/seedCinema.js";
 import authRoutes from "./src/routes/authRoutes.js";
 import userRoutes from "./src/routes/userRoutes.js";
+import movieRoutes from "./src/routes/movieRoutes.js";
+import showtimeRoutes from "./src/routes/showtimeRoutes.js";
+import comboRoutes from "./src/routes/comboRoutes.js";
+import bookingRoutes from "./src/routes/bookingRoutes.js";
 
 // Middleware kiểm tra token/role
 import {
@@ -20,9 +25,10 @@ const app = express();
 
 // ===== Connect DB & Seed SuperAdmin =====
 connectDB()
-  .then(() => {
+  .then(async () => {
     console.log("✅ MongoDB connected");
     seedAdmin(); // Tạo superadmin nếu chưa có
+    await seedCinema();
   })
   .catch((err) => console.error("DB connection error:", err));
 
@@ -70,6 +76,10 @@ app.get("/api/health", (req, res) => {
 // ===== Auth routes =====
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/movies", movieRoutes);
+app.use("/api/showtimes", showtimeRoutes);
+app.use("/api/combos", comboRoutes);
+app.use("/api/bookings", bookingRoutes);
 
 // ===== Example protected routes =====
 app.get("/api/admin/data", verifyToken, requireAdmin, (req, res) => {
