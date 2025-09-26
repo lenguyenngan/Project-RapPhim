@@ -10,7 +10,7 @@ export const moviesData = [
     language: "Tiếng Anh - Phụ đề Việt",
     rating: "C13",
     genre: ["Hành động", "Phiêu lưu", "Khoa học viễn tưởng"],
-    poster: "/public/images/z0gRHPKq0uX2YY5YqKRLiRCoBqN.webp",
+    poster: "https://m.media-amazon.com/images/I/91-UCbbhoiL._AC_SL1500_.jpg",
     trailer: "https://youtube.com/watch?v=TcMBFSGVi1c",
     director: "Anthony Russo, Joe Russo",
     cast: [
@@ -37,7 +37,7 @@ export const moviesData = [
     rating: "C13",
     genre: ["Hành động", "Siêu anh hùng", "Phiêu lưu"],
     poster:
-      "https://images.unsplash.com/photo-1635805737707-575885ab0820?w=300&h=450&fit=crop",
+      "https://images.moviesanywhere.com/5a7e82e7749d6dd8e447fcfeec50c064/55462afc-41ad-4322-ad46-1caca29fcc36.jpg",
     trailer: "https://youtube.com/watch?v=JfVOs4VSpmA",
     director: "Jon Watts",
     cast: ["Tom Holland", "Zendaya", "Benedict Cumberbatch", "Jacob Batalon"],
@@ -108,7 +108,7 @@ export const moviesData = [
     rating: "C13",
     genre: ["Hành động", "Drama"],
     poster:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/1/13/Top_Gun_Maverick_Poster.jpg/250px-Top_Gun_Maverick_Poster.jpg",
+      "https://i5.walmartimages.com/seo/Posters-Top-Gun-Maverick-Movie-Glossy-Print-Wall-Art-Featuring-Tom-Cruise-and-Jennifer-Connelly-27-x-40-Poster_bbb92289-b359-423e-a8fe-6142b188f677.4da7e4af2871002298f4804afb44b955.jpeg",
     trailer: "https://youtube.com/watch?v=qSqVVswa420",
     director: "Joseph Kosinski",
     cast: ["Tom Cruise", "Miles Teller", "Jennifer Connelly", "Jon Hamm"],
