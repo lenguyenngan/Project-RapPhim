@@ -8,8 +8,14 @@ import seedMovies from "./src/seed/seedMovies.js";
 import authRoutes from "./src/routes/authRoutes.js";
 import userRoutes from "./src/routes/userRoutes.js";
 import movieRoutes from "./src/routes/movieRoutes.js";
-import comboRoutes from "./src/routes/comboRoutes.js";
-import bookingRoutes from "./src/routes/bookingRoutes.js";
+import showtimeRoutes from "./src/routes/showtimeRoutes.js";
+import cinemaSystemRoutes from "./src/routes/cinemaSystemRoutes.js";
+import cinemaRoutes from "./src/routes/cinemaRoutes.js";
+import roomRoutes from "./src/routes/roomRoutes.js";
+// import { seedCombos } from "./src/seed/seedCombo.js";
+
+// seedCombos();
+
 import path from "path";
 
 // Middleware kiểm tra token/role
@@ -80,8 +86,10 @@ app.get("/api/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/movies", movieRoutes);
-app.use("/api/combos", comboRoutes);
-app.use("/api/bookings", bookingRoutes);
+app.use("/api/showtimes", showtimeRoutes);
+app.use("/api/cinema-systems", cinemaSystemRoutes);
+app.use("/api/cinemas", cinemaRoutes);
+app.use("/api/rooms", roomRoutes);
 
 // ===== Example protected routes =====
 app.get("/api/admin/data", verifyToken, requireAdmin, (req, res) => {
