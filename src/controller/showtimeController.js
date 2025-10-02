@@ -1,90 +1,65 @@
-import { showtimeData } from "../data/showtimes.js";
+import Showtime from "../model/Showtime.js";
 
-// ===== GET /api/showtimes =====
+// GET /api/showtimes
 export const listShowtimes = async (req, res) => {
-  const { movieId, date, clusterId, hallId, systemId } = req.query;
-  console.log("[Showtimes] LIST query:", {
-    movieId,
-    date,
-    systemId,
-    clusterId,
-    hallId,
-  });
+  try {
+    const { movieId, date, clusterId, hallId, systemId } = req.query;
+    const filter = {};
+    if (movieId) filter.movieId = movieId;
+    if (date) filter.date = date;
+    if (systemId) filter.systemId = systemId;
+    if (clusterId) filter.clusterId = clusterId;
+    if (hallId) filter.hallId = hallId;
 
-  let list = showtimeData;
-
-  if (movieId) list = list.filter((s) => String(s.movieId) === String(movieId));
-  if (date) list = list.filter((s) => s.date === date);
-  if (systemId)
-    list = list.filter((s) => String(s.systemId) === String(systemId)); // ✅ filter systemId
-  if (clusterId) list = list.filter((s) => s.clusterId === clusterId);
-  if (hallId) list = list.filter((s) => s.hallId === hallId);
-
-  const withSeatPricing = list.map((s) => ({
-    ...s,
-    priceBySeatType: s.priceBySeatType || {
-      regular: s.price,
-      vip: Math.round((s.price || 0) * 1.4),
-    },
-  }));
-
-  console.log("[Showtimes] LIST result count:", withSeatPricing.length);
-  res.json({ showtimes: withSeatPricing });
+    const showtimes = await Showtime.find(filter);
+    res.json({ showtimes });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
 };
 
-// ===== POST /api/showtimes =====
+// POST /api/showtimes
+// POST /api/showtimes
 export const createShowtimes = async (req, res) => {
   try {
-    const { movieId, showtimes } = req.body || {};
-    console.log("[Showtimes] CREATE payload:", {
-      movieId,
-      count: Array.isArray(showtimes) ? showtimes.length : 0,
-    });
-
-    if (!movieId) return res.status(400).json({ message: "Thiếu movieId" });
-    if (!Array.isArray(showtimes) || showtimes.length === 0) {
-      return res.status(400).json({ message: "Thiếu danh sách showtimes" });
+    const { movieId, showtimes } = req.body;
+    if (!movieId || !Array.isArray(showtimes) || !showtimes.length) {
+      return res.status(400).json({ message: "Thiếu movieId hoặc showtimes" });
     }
 
-    const created = showtimes.map((s) => {
-      const nextId = `ST${String(showtimeData.length + 1).padStart(3, "0")}`;
+    const created = [];
+    for (const s of showtimes) {
+      // Lấy giá ưu tiên: priceBySeatType -> priceRegular -> price
+      const regular = Number(
+        s.priceBySeatType?.regular ?? s.priceRegular ?? s.price ?? 0
+      );
+      const vip = Number(
+        s.priceBySeatType?.vip ?? s.priceVip ?? Math.round(regular * 1.4)
+      );
 
-      const regular = Number(s.priceRegular || s.price || 0);
-      const vip = Number(s.priceVip || Math.round(regular * 1.4));
-
-      const record = {
-        showtimeId: nextId,
-        movieId: String(movieId),
-        systemId: String(s.systemId || ""), // ✅ lưu systemId
-        clusterId: String(s.clusterId || ""),
-        hallId: String(s.hallId || ""),
-        startTime: String(s.startTime || ""),
-        endTime: String(s.endTime || ""),
-        price: regular,
-        priceBySeatType: { regular, vip },
-        date: String(s.date || ""),
-        availableSeats: Number.isFinite(s.availableSeats)
-          ? Number(s.availableSeats)
-          : 100,
-        totalSeats: Number.isFinite(s.totalSeats) ? Number(s.totalSeats) : 100,
+      const newShowtime = new Showtime({
+        movieId,
+        systemId: String(s.systemId),
+        clusterId: String(s.clusterId),
+        hallId: String(s.hallId),
+        date: s.date,
+        startTime: s.startTime,
+        endTime: s.endTime,
+        price: regular, // giá mặc định
+        priceBySeatType: { regular, vip }, // giá theo loại ghế
+        availableSeats: s.availableSeats || 100,
+        totalSeats: s.totalSeats || 100,
         isActive: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+      });
 
-      showtimeData.push(record);
-      return record;
-    });
+      await newShowtime.save();
+      created.push(newShowtime);
+    }
 
-    console.log(
-      "[Showtimes] CREATED records:",
-      created.map((c) => c.showtimeId)
-    );
-    return res
+    res
       .status(201)
       .json({ message: "Tạo lịch chiếu thành công", showtimes: created });
-  } catch (e) {
-    console.error("Error in createShowtimes:", e);
-    return res.status(500).json({ message: "Server error", error: e.message });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 };
