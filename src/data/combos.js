@@ -6,7 +6,8 @@ export const comboData = [
     description: "1 bắp + 1 nước",
     price: 80000,
     originalPrice: 100000,
-    image: "https://via.placeholder.com/200x200.png?text=Combo+Classic",
+    image:
+      "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=200&h=200&fit=crop",
     items: [
       { name: "Bắp ngô", quantity: 1, price: 50000 },
       { name: "Nước ngọt", quantity: 1, price: 25000 },
@@ -23,7 +24,8 @@ export const comboData = [
     description: "2 bắp + 2 nước + 1 snack",
     price: 150000,
     originalPrice: 200000,
-    image: "https://via.placeholder.com/200x200.png?text=Combo+Family",
+    image:
+      "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=200&h=200&fit=crop",
     items: [
       { name: "Bắp ngô", quantity: 2, price: 100000 },
       { name: "Nước ngọt", quantity: 2, price: 50000 },
@@ -41,7 +43,8 @@ export const comboData = [
     description: "2 bắp + 2 nước + 2 snack + 1 kẹo",
     price: 200000,
     originalPrice: 280000,
-    image: "https://via.placeholder.com/200x200.png?text=Combo+Premium",
+    image:
+      "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=200&h=200&fit=crop",
     items: [
       { name: "Bắp ngô", quantity: 2, price: 100000 },
       { name: "Nước ngọt", quantity: 2, price: 50000 },
@@ -60,7 +63,8 @@ export const comboData = [
     description: "2 bắp + 2 nước + 1 snack + 1 kẹo",
     price: 120000,
     originalPrice: 160000,
-    image: "https://via.placeholder.com/200x200.png?text=Combo+Couple",
+    image:
+      "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=200&h=200&fit=crop",
     items: [
       { name: "Bắp ngô", quantity: 2, price: 100000 },
       { name: "Nước ngọt", quantity: 2, price: 50000 },
@@ -79,7 +83,8 @@ export const comboData = [
     description: "1 bắp nhỏ + 1 nước + 1 kẹo + 1 đồ chơi",
     price: 60000,
     originalPrice: 80000,
-    image: "https://via.placeholder.com/200x200.png?text=Combo+Kids",
+    image:
+      "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=200&h=200&fit=crop",
     items: [
       { name: "Bắp ngô nhỏ", quantity: 1, price: 30000 },
       { name: "Nước ngọt", quantity: 1, price: 25000 },
@@ -98,7 +103,8 @@ export const comboData = [
     description: "2 bắp + 2 nước premium + 2 snack + 1 kẹo + 1 bánh",
     price: 300000,
     originalPrice: 400000,
-    image: "https://via.placeholder.com/200x200.png?text=Combo+VIP",
+    image:
+      "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=200&h=200&fit=crop",
     items: [
       { name: "Bắp ngô", quantity: 2, price: 100000 },
       { name: "Nước premium", quantity: 2, price: 80000 },

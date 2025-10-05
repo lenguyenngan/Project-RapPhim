@@ -1,37 +1,53 @@
 import mongoose from "mongoose";
 
-const bookingSchema = new mongoose.Schema(
+const BookingSchema = new mongoose.Schema(
   {
+    bookingCode: { type: String, unique: true },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
     movieId: { type: String, required: true },
-    date: { type: String, required: true }, // YYYY-MM-DD
-    clusterId: { type: String, required: true },
-    hallId: { type: String, required: true },
-    startTime: { type: String, required: true },
-    endTime: { type: String, required: true },
-    seats: { type: [String], required: true },
-    pricePerSeat: { type: Number, required: true },
-    totalPrice: { type: Number, required: true },
-    status: {
-      type: String,
-      enum: ["confirmed", "cancelled"],
-      default: "confirmed",
+    showtimeId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Showtime",
+      required: true,
     },
+    clusterId: { type: String },
+    hallId: { type: String },
+    date: { type: String, required: true },
+    startTime: { type: String, required: true },
+    endTime: { type: String },
+    seats: [
+      {
+        seatNumber: { type: String, required: true },
+        seatType: {
+          type: String,
+          enum: ["regular", "vip"],
+          default: "regular",
+        },
+        price: { type: Number, required: true },
+      },
+    ],
+    combos: [
+      {
+        comboId: { type: mongoose.Schema.Types.ObjectId, ref: "Combo" },
+        name: String,
+        quantity: { type: Number, default: 1 },
+        price: Number,
+      },
+    ],
+    totalPrice: { type: Number, required: true },
+    paymentStatus: {
+      type: String,
+      enum: ["pending", "paid", "cancelled"],
+      default: "pending",
+    },
+    paymentMethod: { type: String, default: "cash" },
+    isActive: { type: Boolean, default: true },
   },
   { timestamps: true }
 );
 
-bookingSchema.index({
-  movieId: 1,
-  date: 1,
-  clusterId: 1,
-  hallId: 1,
-  startTime: 1,
-});
-
-const Booking = mongoose.model("Booking", bookingSchema);
-export default Booking;
+export default mongoose.model("Booking", BookingSchema);

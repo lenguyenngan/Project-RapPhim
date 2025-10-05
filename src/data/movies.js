@@ -10,7 +10,7 @@ export const moviesData = [
     language: "Tiếng Anh - Phụ đề Việt",
     rating: "C13",
     genre: ["Hành động", "Phiêu lưu", "Khoa học viễn tưởng"],
-    poster: "https://m.media-amazon.com/images/I/91-UCbbhoiL._AC_SL1500_.jpg",
+    poster: "/images/z0gRHPKq0uX2YY5YqKRLiRCoBqN.webp",
     trailer: "https://youtube.com/watch?v=TcMBFSGVi1c",
     director: "Anthony Russo, Joe Russo",
     cast: [
@@ -37,7 +37,7 @@ export const moviesData = [
     rating: "C13",
     genre: ["Hành động", "Siêu anh hùng", "Phiêu lưu"],
     poster:
-      "https://images.moviesanywhere.com/5a7e82e7749d6dd8e447fcfeec50c064/55462afc-41ad-4322-ad46-1caca29fcc36.jpg",
+      "https://images.unsplash.com/photo-1635805737707-575885ab0820?w=300&h=450&fit=crop",
     trailer: "https://youtube.com/watch?v=JfVOs4VSpmA",
     director: "Jon Watts",
     cast: ["Tom Holland", "Zendaya", "Benedict Cumberbatch", "Jacob Batalon"],
@@ -59,7 +59,7 @@ export const moviesData = [
     rating: "C13",
     genre: ["Khoa học viễn tưởng", "Phiêu lưu", "Drama"],
     poster:
-      "https://posterspy.com/wp-content/uploads/2024/04/Dune-Finished.jpg",
+      "/images/dune__part_two_poster_2__updated_release_date__by_paramountj_dg6v4iy-fullview.jpg",
     trailer: "https://youtube.com/watch?v=n9xhJrPXop4",
     director: "Denis Villeneuve",
     cast: [
@@ -86,7 +86,7 @@ export const moviesData = [
     rating: "C16",
     genre: ["Hành động", "Tội phạm", "Drama"],
     poster:
-      "https://m.media-amazon.com/images/M/MV5BMmU5NGJlMzAtMGNmOC00YjJjLTgyMzUtNjAyYmE4Njg5YWMyXkEyXkFqcGc@._V1_.jpg",
+      "https://images.unsplash.com/photo-1644982647844-5f1b8241205f?w=300&h=450&fit=crop",
     trailer: "https://youtube.com/watch?v=mqqft2x_Aa4",
     director: "Matt Reeves",
     cast: ["Robert Pattinson", "Zoë Kravitz", "Paul Dano", "Jeffrey Wright"],
@@ -108,7 +108,7 @@ export const moviesData = [
     rating: "C13",
     genre: ["Hành động", "Drama"],
     poster:
-      "https://i5.walmartimages.com/seo/Posters-Top-Gun-Maverick-Movie-Glossy-Print-Wall-Art-Featuring-Tom-Cruise-and-Jennifer-Connelly-27-x-40-Poster_bbb92289-b359-423e-a8fe-6142b188f677.4da7e4af2871002298f4804afb44b955.jpeg",
+      "https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=300&h=450&fit=crop",
     trailer: "https://youtube.com/watch?v=qSqVVswa420",
     director: "Joseph Kosinski",
     cast: ["Tom Cruise", "Miles Teller", "Jennifer Connelly", "Jon Hamm"],

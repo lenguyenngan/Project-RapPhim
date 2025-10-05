@@ -1,16 +1,28 @@
+// routes/combos.js
 import express from "express";
 import {
-  listCombos,
-  getComboDetail,
+  getAllCombos,
+  getComboById,
   createCombo,
+  updateCombo,
+  deleteCombo,
 } from "../controller/comboController.js";
 
 const router = express.Router();
 
-router.get("/", listCombos);
-router.get("/:comboId", getComboDetail);
+// ✅ Lấy danh sách tất cả combo
+router.get("/", getAllCombos);
 
-// 👉 Route thêm combo mới (chỉ admin dùng)
+// ✅ Lấy 1 combo cụ thể theo ID
+router.get("/:id", getComboById);
+
+// ✅ Thêm combo mới
 router.post("/", createCombo);
+
+// ✅ Cập nhật combo
+router.put("/:id", updateCombo);
+
+// ✅ Xóa combo
+router.delete("/:id", deleteCombo);
 
 export default router;

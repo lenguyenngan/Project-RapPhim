@@ -39,5 +39,4 @@ MovieSchema.pre("save", async function (next) {
   }
 });
 
-const Movie = mongoose.model("Movie", MovieSchema);
-export default Movie;
+export default mongoose.models.Movie || mongoose.model("Movie", MovieSchema);
