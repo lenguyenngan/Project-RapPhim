@@ -107,8 +107,7 @@ export const moviesData = [
     language: "Tiếng Anh - Phụ đề Việt",
     rating: "C13",
     genre: ["Hành động", "Drama"],
-    poster:
-      "https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=300&h=450&fit=crop",
+    poster: "/images/TogGunMaverick_Poster02.jpg",
     trailer: "https://youtube.com/watch?v=qSqVVswa420",
     director: "Joseph Kosinski",
     cast: ["Tom Cruise", "Miles Teller", "Jennifer Connelly", "Jon Hamm"],

@@ -105,7 +105,6 @@ export const createMovie = async (req, res) => {
           : [],
       imdbRating: body.imdbRating ? Number(body.imdbRating) : 0,
       isHot: Boolean(body.isHot),
-      isComingSoon: Boolean(body.isComingSoon),
       status: body.status === "coming_soon" ? "coming_soon" : "showing",
     };
 
@@ -137,8 +136,8 @@ export const updateMovie = async (req, res) => {
     movie.director = req.body.director || movie.director;
     movie.cast = req.body.cast || movie.cast;
     movie.imdbRating = req.body.imdbRating ?? movie.imdbRating;
-    movie.isHot = req.body.isHot ?? movie.isHot;
-    movie.isComingSoon = req.body.isComingSoon ?? movie.isComingSoon;
+    movie.isHot =
+      req.body.isHot !== undefined ? Boolean(req.body.isHot) : movie.isHot;
     movie.status = req.body.status || movie.status;
 
     const updatedMovie = await movie.save();

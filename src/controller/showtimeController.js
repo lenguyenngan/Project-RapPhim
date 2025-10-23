@@ -18,6 +18,23 @@ export const listShowtimes = async (req, res) => {
   }
 };
 
+// GET /api/showtimes/:showtimeId
+export const getShowtimeById = async (req, res) => {
+  try {
+    const { showtimeId } = req.params;
+    // Tìm showtime bằng _id hoặc showtimeId (nếu có)
+    const showtime =
+      (await Showtime.findById(showtimeId)) ||
+      (await Showtime.findOne({ showtimeId }));
+    if (!showtime) {
+      return res.status(404).json({ message: "Showtime not found" });
+    }
+    res.json(showtime);
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
 // POST /api/showtimes
 // POST /api/showtimes
 export const createShowtimes = async (req, res) => {
@@ -59,6 +76,24 @@ export const createShowtimes = async (req, res) => {
     res
       .status(201)
       .json({ message: "Tạo lịch chiếu thành công", showtimes: created });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+// DELETE /api/showtimes/movie/:movieId
+export const deleteShowtimesByMovie = async (req, res) => {
+  try {
+    const { movieId } = req.params;
+    if (!movieId) {
+      return res.status(400).json({ message: "Thiếu movieId" });
+    }
+
+    const result = await Showtime.deleteMany({ movieId });
+    res.json({
+      message: "Xóa lịch chiếu thành công",
+      deletedCount: result.deletedCount,
+    });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }

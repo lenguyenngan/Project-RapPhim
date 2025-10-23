@@ -1,53 +1,115 @@
+// model/Booking.js
 import mongoose from "mongoose";
 
 const BookingSchema = new mongoose.Schema(
   {
-    bookingCode: { type: String, unique: true },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-    movieId: { type: String, required: true },
+    userEmail: {
+      type: String,
+      required: false,
+      default: "unknown@example.com",
+    },
     showtimeId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Showtime",
+      type: String,
       required: true,
     },
-    clusterId: { type: String },
-    hallId: { type: String },
-    date: { type: String, required: true },
-    startTime: { type: String, required: true },
-    endTime: { type: String },
+    movieTitle: {
+      type: String,
+      required: true,
+    },
+    moviePoster: {
+      type: String,
+      default: "/images/default-poster.jpg",
+    },
+
+    cinemaInfo: {
+      type: {
+        systemName: { type: String, required: false, default: "CGV Cinemas" },
+        clusterName: {
+          type: String,
+          required: false,
+          default: "Cụm rạp mặc định",
+        },
+        hallName: { type: String, required: false, default: "Phòng chiếu 1" },
+      },
+      required: false,
+      default: {},
+    },
+
+    showtimeInfo: {
+      date: { type: String, required: true },
+      startTime: { type: String, required: true },
+      endTime: { type: String, required: true },
+    },
+
     seats: [
       {
         seatNumber: { type: String, required: true },
-        seatType: {
-          type: String,
-          enum: ["regular", "vip"],
-          default: "regular",
-        },
+        type: { type: String, enum: ["regular", "vip"], required: true },
         price: { type: Number, required: true },
       },
     ],
+
     combos: [
       {
-        comboId: { type: mongoose.Schema.Types.ObjectId, ref: "Combo" },
-        name: String,
-        quantity: { type: Number, default: 1 },
-        price: Number,
+        comboId: { type: String },
+        name: { type: String },
+        price: { type: Number },
+        quantity: { type: Number },
       },
     ],
-    totalPrice: { type: Number, required: true },
+
+    total: {
+      type: Number,
+      required: true,
+    },
+
+    paymentMethod: {
+      type: String,
+      enum: ["momo", "vnpay", "visa", "cod"],
+      required: true,
+    },
+
     paymentStatus: {
       type: String,
-      enum: ["pending", "paid", "cancelled"],
+      enum: ["pending", "paid", "failed", "cancelled"],
       default: "pending",
     },
-    paymentMethod: { type: String, default: "cash" },
-    isActive: { type: Boolean, default: true },
+
+    bookingStatus: {
+      type: String,
+      enum: ["confirmed", "cancelled", "expired"],
+      default: "confirmed",
+    },
+
+    qrCode: {
+      type: String,
+    },
+
+    bookingCode: {
+      type: String,
+      unique: true,
+      required: true,
+    },
+
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true }
 );
 
-export default mongoose.model("Booking", BookingSchema);
+BookingSchema.index({ userId: 1 });
+BookingSchema.index({ showtimeId: 1 });
+BookingSchema.index({ bookingCode: 1 });
+BookingSchema.index({ paymentStatus: 1 });
+BookingSchema.index({ createdAt: -1 });
+
+const Booking =
+  mongoose.models.Booking || mongoose.model("Booking", BookingSchema);
+export default Booking;

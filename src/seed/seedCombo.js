@@ -1,6 +1,6 @@
 // src/seed/seedCombo.js
 import Combo from "../model/Combo.js";
-import { comboData } from "../../data/combo.js";
+import { comboData } from "../data/combos.js";
 
 export const seedCombos = async () => {
   try {
