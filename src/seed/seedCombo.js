@@ -2,7 +2,7 @@
 import Combo from "../model/Combo.js";
 import { comboData } from "../data/combos.js";
 
-export const seedCombos = async () => {
+const seedCombos = async () => {
   try {
     const existingCount = await Combo.countDocuments();
     if (existingCount > 0) {
@@ -10,7 +10,6 @@ export const seedCombos = async () => {
       return;
     }
 
-    // Loại bỏ các trường MongoDB không cần thiết (nếu có)
     const cleanCombos = comboData.map((combo) => ({
       comboId: combo.comboId,
       name: combo.name,
@@ -20,16 +19,17 @@ export const seedCombos = async () => {
       image: combo.image,
       items: combo.items,
       discount: combo.discount,
-      isActive: combo.isActive,
+      isActive: combo.isActive ?? true,
       category: combo.category,
-      createdAt: combo.createdAt,
-      updatedAt: combo.updatedAt,
+      createdAt: combo.createdAt || new Date(),
+      updatedAt: combo.updatedAt || new Date(),
     }));
 
     await Combo.insertMany(cleanCombos);
-
     console.log(`🍿 Seeded ${cleanCombos.length} combo mẫu thành công!`);
   } catch (error) {
     console.error("❌ Lỗi khi seed combo:", error.message);
   }
 };
+
+export default seedCombos;

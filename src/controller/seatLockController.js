@@ -1,42 +1,60 @@
-// controllers/seatLockController.js
-import SeatLock from "../model/SeatLock.js";
 import mongoose from "mongoose";
+import SeatLock from "../model/SeatLock.js";
 import Showtime from "../model/showtime.js";
 import Booking from "../model/Booking.js";
 import Cinema from "../model/Cinema.js";
 import CinemaSystem from "../model/CinemaSystem.js";
 
-// ✅ Giữ ghế (lock seats)
+// =======================================================
+// ✅ GIỮ GHẾ (LOCK SEATS)
+// =======================================================
 export const lockSeats = async (req, res) => {
   try {
     const { showtimeId, seatNumbers, userId, userEmail } = req.body;
 
-    if (!showtimeId || !seatNumbers?.length)
-      return res
-        .status(400)
-        .json({ message: "Thiếu thông tin suất chiếu hoặc danh sách ghế." });
+    // --- Kiểm tra dữ liệu đầu vào
+    if (
+      !showtimeId ||
+      !Array.isArray(seatNumbers) ||
+      seatNumbers.length === 0
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Thiếu thông tin suất chiếu hoặc danh sách ghế.",
+      });
+    }
 
-    if (!userId || !userEmail)
-      return res.status(400).json({ message: "Thiếu thông tin người dùng." });
+    if (!userId || !userEmail) {
+      return res.status(400).json({
+        success: false,
+        message: "Thiếu thông tin người dùng.",
+      });
+    }
 
+    // --- Kiểm tra suất chiếu tồn tại
     const showtime = await Showtime.findById(showtimeId);
-    if (!showtime)
-      return res.status(404).json({ message: "Không tìm thấy suất chiếu." });
+    if (!showtime) {
+      return res.status(404).json({
+        success: false,
+        message: "Không tìm thấy suất chiếu.",
+      });
+    }
 
     const seatData = Array.isArray(showtime.seatData) ? showtime.seatData : [];
 
-    // Kiểm tra ghế đã bị chiếm hoặc bị lock
+    // --- Xác định ghế đã bị chiếm hoặc bán
     const occupiedSeats = new Set(
       seatData
         .filter(
           (s) =>
             s &&
             seatNumbers.includes(s.seatNumber) &&
-            (s.status === "occupied" || s.status === "sold")
+            ["occupied", "sold"].includes(s.status)
         )
         .map((s) => s.seatNumber)
     );
 
+    // --- Lấy danh sách ghế đang bị giữ (lock)
     const activeLocks = await SeatLock.find({
       showtimeId,
       isActive: true,
@@ -51,23 +69,26 @@ export const lockSeats = async (req, res) => {
       }
     }
 
+    // --- Nếu có ghế bị chiếm hoặc lock thì trả về lỗi
     const conflictingSeats = Array.from(
       new Set([...occupiedSeats, ...lockedSeats])
     );
     if (conflictingSeats.length > 0) {
       return res.status(409).json({
+        success: false,
         message: "Một số ghế đã được giữ hoặc đặt.",
         conflictingSeats,
       });
     }
 
-    // Deactivate lock cũ của user (nếu có)
+    // --- Hủy các lock cũ đã hết hạn của user
     await SeatLock.updateMany(
       { userId, showtimeId, isActive: true, expiresAt: { $lt: new Date() } },
       { $set: { isActive: false } }
     );
 
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    // --- Tạo mới lock
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 phút
     const seatLock = await SeatLock.create({
       showtimeId,
       seatNumbers,
@@ -77,27 +98,35 @@ export const lockSeats = async (req, res) => {
       isActive: true,
     });
 
-    res.json({
+    return res.status(200).json({
       success: true,
+      message: "Đã giữ ghế thành công.",
       lockId: seatLock._id,
       expiresAt,
       expiresIn: Math.floor((expiresAt - new Date()) / 1000),
-      message: "Đã giữ ghế thành công.",
     });
   } catch (error) {
     console.error("❌ lockSeats error:", error);
-    res
-      .status(500)
-      .json({ message: "Lỗi server khi giữ ghế.", error: error.message });
+    res.status(500).json({
+      success: false,
+      message: "Lỗi server khi giữ ghế.",
+      error: error.message,
+    });
   }
 };
 
-// ✅ Lấy danh sách ghế bị giữ
+// =======================================================
+// ✅ LẤY DANH SÁCH GHẾ ĐANG BỊ GIỮ
+// =======================================================
 export const getLockedSeats = async (req, res) => {
   try {
     const { showtimeId } = req.params;
-    if (!showtimeId)
-      return res.status(400).json({ message: "Thiếu showtimeId" });
+
+    if (!showtimeId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Thiếu showtimeId." });
+    }
 
     const lockedSeats = await SeatLock.find({
       showtimeId,
@@ -105,6 +134,7 @@ export const getLockedSeats = async (req, res) => {
       expiresAt: { $gt: new Date() },
     }).select("seatNumbers userId userEmail expiresAt");
 
+    // Gộp toàn bộ ghế bị giữ thành 1 mảng
     const allLockedSeats = lockedSeats.flatMap((lock) =>
       lock.seatNumbers.map((seatNumber) => ({
         seatNumber,
@@ -114,159 +144,172 @@ export const getLockedSeats = async (req, res) => {
       }))
     );
 
-    res.json({ success: true, lockedSeats: allLockedSeats });
+    return res.status(200).json({
+      success: true,
+      lockedSeats: allLockedSeats,
+    });
   } catch (error) {
     console.error("❌ getLockedSeats error:", error);
-    res.status(500).json({ message: "Lỗi server khi lấy ghế bị giữ." });
+    res.status(500).json({
+      success: false,
+      message: "Lỗi server khi lấy ghế bị giữ.",
+      error: error.message,
+    });
   }
 };
 
-// ✅ Hủy giữ ghế
+// =======================================================
+// ✅ HỦY GIỮ GHẾ (UNLOCK SEATS)
+// =======================================================
 export const unlockSeats = async (req, res) => {
   try {
     const { lockId, userId } = req.body;
-    if (!lockId || !userId)
-      return res.status(400).json({ message: "Thiếu thông tin." });
+
+    if (!lockId || !userId) {
+      return res.status(400).json({
+        success: false,
+        message: "Thiếu thông tin lockId hoặc userId.",
+      });
+    }
 
     const result = await SeatLock.updateOne(
       { _id: lockId, userId, isActive: true },
       { $set: { isActive: false } }
     );
 
-    if (result.matchedCount === 0)
-      return res
-        .status(404)
-        .json({ message: "Không tìm thấy lock hoặc không có quyền unlock." });
+    if (result.matchedCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Không tìm thấy lock hoặc bạn không có quyền hủy.",
+      });
+    }
 
-    res.json({ success: true, message: "Đã hủy giữ ghế thành công." });
+    return res.status(200).json({
+      success: true,
+      message: "Đã hủy giữ ghế thành công.",
+    });
   } catch (error) {
     console.error("❌ unlockSeats error:", error);
-    res.status(500).json({ message: "Lỗi server khi hủy giữ ghế." });
+    res.status(500).json({
+      success: false,
+      message: "Lỗi server khi hủy giữ ghế.",
+      error: error.message,
+    });
   }
 };
 
-// ✅ Xác nhận đặt vé (confirm booking)
+// =======================================================
+// ✅ XÁC NHẬN ĐẶT VÉ (CONFIRM BOOKING) — FIX COMBO DETAIL
+// =======================================================
 export const confirmBooking = async (req, res) => {
   try {
-    const { lockId, bookingData } = req.body;
+    const { lockId, userId, bookingData } = req.body;
 
-    const authUserId = req.user?._id || req.user?.id || bookingData?.userId;
-    const userId = authUserId ? String(authUserId) : undefined;
-    const userObjectId =
-      authUserId && mongoose.isValidObjectId(authUserId)
-        ? new mongoose.Types.ObjectId(authUserId)
-        : null;
-
-    if (!lockId || !bookingData) {
-      return res.status(400).json({ message: "Thiếu dữ liệu." });
+    if (!lockId || !userId || !bookingData) {
+      return res.status(400).json({
+        success: false,
+        message: "Thiếu lockId, userId hoặc bookingData.",
+      });
     }
 
     const seatLock = await SeatLock.findById(lockId);
-    if (!seatLock)
-      return res.status(404).json({ message: "Không tìm thấy lock." });
+    if (!seatLock) {
+      return res.status(404).json({
+        success: false,
+        message: "Không tìm thấy lockId.",
+      });
+    }
 
-    const showtime = await Showtime.findById(seatLock.showtimeId);
-    if (!showtime)
-      return res.status(404).json({ message: "Không tìm thấy suất chiếu." });
+    if (!seatLock.isActive) {
+      return res.status(400).json({
+        success: false,
+        message: "Lock đã hết hạn hoặc không còn hiệu lực.",
+      });
+    }
 
-    // ✅ Cập nhật trạng thái ghế
-    const seatsArr = Array.isArray(showtime.seatData)
-      ? showtime.seatData
-      : showtime.seats || [];
-
-    for (let seat of seatsArr) {
-      if (seatLock.seatNumbers.includes(seat.seatNumber)) {
-        seat.status = "occupied";
+    // 🟢 Lấy thông tin combo chi tiết từ DB
+    const comboDetails = [];
+    if (
+      Array.isArray(bookingData.selectedCombos) &&
+      bookingData.selectedCombos.length > 0
+    ) {
+      for (const comboItem of bookingData.selectedCombos) {
+        const combo = await Combo.findById(
+          comboItem._id || comboItem.id
+        ).lean();
+        if (combo) {
+          comboDetails.push({
+            comboId: combo._id,
+            name: combo.name,
+            price: combo.price,
+            quantity: comboItem.quantity || 1,
+            totalPrice: combo.price * (comboItem.quantity || 1),
+          });
+        }
       }
     }
-    if (Array.isArray(showtime.seatData)) showtime.seatData = seatsArr;
-    else showtime.seats = seatsArr;
-    await showtime.save();
 
-    // ✅ Hủy hiệu lực lock
-    if (seatLock.isActive) {
-      seatLock.isActive = false;
-      await seatLock.save();
-    }
+    // 🟢 Tính tổng combo (nếu có)
+    const totalComboPrice = comboDetails.reduce(
+      (sum, c) => sum + c.totalPrice,
+      0
+    );
 
-    // ✅ Tạo mã booking
-    const bookingCode = `BK${Date.now()}${Math.random()
-      .toString(36)
-      .substr(2, 4)
-      .toUpperCase()}`;
+    // 🟢 Tổng tiền cuối cùng (bao gồm combo + vé)
+    const grandTotal = bookingData.total + totalComboPrice;
 
-    const seats = Array.isArray(bookingData.selectedSeats)
-      ? bookingData.selectedSeats.map((s) => ({
-          seatNumber: s.seatNumber || s,
-          type: s.type || "regular",
-          price: Number(s.price || 0),
-        }))
-      : [];
-
-    const combosArr = Object.entries(bookingData.selectedCombos || {})
-      .filter(([, q]) => q > 0)
-      .map(([comboId, quantity]) => ({
-        comboId,
-        name: String(comboId),
-        price: 0,
-        quantity,
-      }));
-
-    const userEmail =
-      req.user?.email || bookingData.userEmail || seatLock.userEmail;
-
-    // ✅ Tạo booking mới
-    const newBooking = await Booking.create({
-      userId: userObjectId,
-      userEmail,
-      showtimeId: String(seatLock.showtimeId),
+    // ✅ Tạo booking
+    const newBooking = new Booking({
+      userId,
+      showtimeId: seatLock.showtimeId,
+      userEmail: bookingData.userEmail,
       movieTitle: bookingData.movieTitle,
       moviePoster: bookingData.moviePoster,
+
       cinemaInfo: {
-        systemName: bookingData.systemName,
-        clusterName: bookingData.clusterName,
-        hallName: bookingData.hallName,
+        systemName: bookingData.systemName || "Hệ thống rạp",
+        clusterName: bookingData.clusterName || "Cụm rạp",
+        hallName: bookingData.hallName || "Phòng chiếu",
+        systemId: bookingData.systemId,
+        clusterId: bookingData.clusterId,
+        hallId: bookingData.hallId,
       },
+
       showtimeInfo: {
         date: bookingData.date,
         startTime: bookingData.startTime,
         endTime: bookingData.endTime,
       },
-      seats,
-      combos: combosArr,
-      total: Number(bookingData.total || 0),
-      paymentMethod: bookingData.paymentMethod || "momo",
+
+      seats: bookingData.selectedSeats,
+      combos: comboDetails, // ✅ Lưu combo chi tiết
+      total: grandTotal, // ✅ Gồm cả tiền combo
+
+      paymentMethod: bookingData.paymentMethod,
       paymentStatus: "paid",
       bookingStatus: "confirmed",
-      bookingCode,
+      bookingCode: `BK${Date.now()}`,
+      qrCode: `QR-${Date.now()}`,
     });
 
-    // ✅ Lưu thông tin vào Cinema và CinemaSystem
-    const { systemName, clusterName } = bookingData;
-    if (systemName) {
-      await CinemaSystem.findOneAndUpdate(
-        { name: systemName },
-        { $push: { bookings: newBooking._id } },
-        { upsert: true, new: true }
-      );
-    }
-    if (clusterName) {
-      await Cinema.findOneAndUpdate(
-        { name: clusterName },
-        { $push: { bookings: newBooking._id } },
-        { upsert: true, new: true }
-      );
-    }
+    await newBooking.save();
 
-    return res.json({
+    // ✅ Cập nhật trạng thái lock
+    seatLock.isActive = false;
+    seatLock.status = "confirmed";
+    await seatLock.save();
+
+    return res.status(200).json({
       success: true,
-      message: "Đặt vé thành công",
-      bookingCode,
+      message: "Xác nhận đặt vé thành công.",
+      booking: newBooking,
     });
   } catch (error) {
     console.error("❌ confirmBooking error:", error);
-    res
-      .status(500)
-      .json({ message: error.message || "Lỗi khi xác nhận đặt vé." });
+    res.status(500).json({
+      success: false,
+      message: "Lỗi server khi xác nhận đặt vé.",
+      error: error.message,
+    });
   }
 };

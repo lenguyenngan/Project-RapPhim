@@ -1,4 +1,3 @@
-// server.js
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -15,6 +14,7 @@ import roomRoutes from "./src/routes/roomRoutes.js";
 import seatLockRoutes from "./src/routes/seatLockRoutes.js";
 import bookingRoutes from "./src/routes/bookingRoutes.js";
 import comboRoutes from "./src/routes/comboRoutes.js";
+import seedCombos from "./src/seed/seedCombo.js";
 import path from "path";
 
 // Middleware kiểm tra token/role
@@ -32,8 +32,9 @@ const app = express();
 connectDB()
   .then(async () => {
     console.log("✅ MongoDB connected");
-    seedAdmin(); // Tạo superadmin nếu chưa có
-    await seedMovies(); // Seed movies nếu trống
+    await seedAdmin();
+    await seedMovies();
+    await seedCombos(); // 👈 Thêm dòng này
   })
   .catch((err) => console.error("DB connection error:", err));
 

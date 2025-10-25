@@ -1,6 +1,14 @@
 // model/Booking.js
 import mongoose from "mongoose";
 
+const comboSchema = new mongoose.Schema({
+  comboId: { type: String, ref: "Combo" },
+  name: { type: String, required: true },
+  price: { type: Number, required: true },
+  quantity: { type: Number, required: true },
+  totalPrice: { type: Number, required: true }, // ✅ Thêm totalPrice để FE hiển thị giá combo
+});
+
 const BookingSchema = new mongoose.Schema(
   {
     userId: {
@@ -10,7 +18,6 @@ const BookingSchema = new mongoose.Schema(
     },
     userEmail: {
       type: String,
-      required: false,
       default: "unknown@example.com",
     },
     showtimeId: {
@@ -27,17 +34,9 @@ const BookingSchema = new mongoose.Schema(
     },
 
     cinemaInfo: {
-      type: {
-        systemName: { type: String, required: false, default: "CGV Cinemas" },
-        clusterName: {
-          type: String,
-          required: false,
-          default: "Cụm rạp mặc định",
-        },
-        hallName: { type: String, required: false, default: "Phòng chiếu 1" },
-      },
-      required: false,
-      default: {},
+      systemName: { type: String, default: "CGV Cinemas" },
+      clusterName: { type: String, default: "Cụm rạp mặc định" },
+      hallName: { type: String, default: "Phòng chiếu 1" },
     },
 
     showtimeInfo: {
@@ -54,19 +53,9 @@ const BookingSchema = new mongoose.Schema(
       },
     ],
 
-    combos: [
-      {
-        comboId: { type: String },
-        name: { type: String },
-        price: { type: Number },
-        quantity: { type: Number },
-      },
-    ],
+    combos: [comboSchema], // ✅ Chuẩn hơn: lưu dạng object comboSchema
 
-    total: {
-      type: Number,
-      required: true,
-    },
+    total: { type: Number, required: true },
 
     paymentMethod: {
       type: String,
@@ -86,9 +75,7 @@ const BookingSchema = new mongoose.Schema(
       default: "confirmed",
     },
 
-    qrCode: {
-      type: String,
-    },
+    qrCode: { type: String },
 
     bookingCode: {
       type: String,
@@ -96,14 +83,12 @@ const BookingSchema = new mongoose.Schema(
       required: true,
     },
 
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
+    isActive: { type: Boolean, default: true },
   },
   { timestamps: true }
 );
 
+// Index để tối ưu truy vấn
 BookingSchema.index({ userId: 1 });
 BookingSchema.index({ showtimeId: 1 });
 BookingSchema.index({ bookingCode: 1 });
@@ -112,4 +97,5 @@ BookingSchema.index({ createdAt: -1 });
 
 const Booking =
   mongoose.models.Booking || mongoose.model("Booking", BookingSchema);
+
 export default Booking;
